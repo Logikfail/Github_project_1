@@ -180,6 +180,7 @@ func _check_wave_complete() -> void:
 	var escaped_count: int = _wave.escaped
 	var infected_count: int = _wave.infected
 	_wave = null
+	print("[WaveManager] wave_complete emit — escaped=", escaped_count, " infected=", infected_count)
 	wave_complete.emit(house, all_infected, escaped_count, infected_count)
 
 
