@@ -2,6 +2,10 @@ extends Node
 ## Procedural village layout — houses, obstacles, exit tile.
 ## Returns a fully populated VillageData whose every house spawn has a valid path to exit.
 ## modifier_cards is left empty — filled by CampaignManager after generation.
+##
+## Two generation modes, toggled by GameConfig.USE_MODULAR_GENERATION:
+##   • Legacy: random per-tile house placement + random obstacle scattering.
+##   • Modular: pick a VillageSkeleton, place one Module per slot, then run filler obstacles.
 
 
 # === Constants ===
@@ -28,12 +32,299 @@ const _TILESET_ID: Dictionary = {
 }
 
 
+# === Private Variables ===
+
+# Cached skeleton + module pool — built lazily on first modular generation.
+var _skeleton: VillageSkeleton = null
+var _module_pool: Array[Module] = []
+
+
 # === Public API ===
 
 func generate_village(village_index: int, seed: int) -> VillageData:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed
+	if GameConfig.USE_MODULAR_GENERATION:
+		return _generate_modular(rng, village_index)
+	return _generate_legacy(rng, village_index)
 
+
+# === Modular Generation ===
+
+func _generate_modular(rng: RandomNumberGenerator, village_index: int) -> VillageData:
+	if _skeleton == null:
+		_skeleton = _build_test_skeleton()
+		_module_pool = _build_module_pool()
+
+	var data := VillageData.new()
+	data.village_index = village_index
+	data.exit_tiles = _skeleton.exit_tiles.duplicate()
+
+	var occupied: Dictionary = {}        # Vector2i → true (any non-walkable tile)
+	var house_spawns: Array[Vector2i] = []
+	var module_obstacles: Array[Vector2i] = []
+
+	for slot_idx: int in _skeleton.slots.size():
+		var slot: SlotDef = _skeleton.slots[slot_idx]
+		var module: Module = _pick_module_for_slot(rng, slot)
+		if module == null:
+			continue   # slot left empty — generator could not satisfy constraints
+
+		var house_tile: Vector2i = slot.origin_tile + module.house_offset
+		house_spawns.append(house_tile)
+
+		for off: Vector2i in module.obstacle_offsets:
+			var tile: Vector2i = slot.origin_tile + off
+			module_obstacles.append(tile)
+			occupied[tile] = true
+
+		data.houses.append(_make_house_from_module(module, house_tile, slot_idx, village_index))
+
+	# Filler obstacles fill the remaining walkable tiles, preserving the path invariant.
+	var filler: Array[Vector2i] = _place_filler_obstacles(
+		rng, module_obstacles, house_spawns, data.exit_tiles, occupied
+	)
+	var all_obstacles: Array[Vector2i] = []
+	for t: Vector2i in module_obstacles:
+		all_obstacles.append(t)
+	for t: Vector2i in filler:
+		all_obstacles.append(t)
+	data.obstacle_tiles = all_obstacles
+
+	return data
+
+
+func _pick_module_for_slot(rng: RandomNumberGenerator, slot: SlotDef) -> Module:
+	# Filter pool by category gate (empty allowed_categories = any category accepted)
+	# and by footprint fit.
+	var candidates: Array[Module] = []
+	for m: Module in _module_pool:
+		if not _module_fits_slot(m, slot):
+			continue
+		if slot.allowed_categories.size() > 0 and not slot.allowed_categories.has(m.category):
+			continue
+		candidates.append(m)
+	if candidates.is_empty():
+		return null
+	for _attempt: int in GameConfig.MODULE_ASSIGNMENT_ATTEMPTS:
+		var pick: Module = candidates[rng.randi() % candidates.size()]
+		return pick
+	return null
+
+
+func _module_fits_slot(m: Module, slot: SlotDef) -> bool:
+	return m.footprint.x <= slot.bounds.x and m.footprint.y <= slot.bounds.y
+
+
+func _place_filler_obstacles(
+	rng: RandomNumberGenerator,
+	module_obstacles: Array[Vector2i],
+	house_spawns: Array[Vector2i],
+	exit_tiles: Array[Vector2i],
+	occupied: Dictionary
+) -> Array[Vector2i]:
+	# Forbid module obstacle tiles, house spawn tiles, and exit tiles from filler placement.
+	var forbidden: Dictionary = occupied.duplicate()
+	for t: Vector2i in house_spawns:
+		forbidden[t] = true
+	for t: Vector2i in exit_tiles:
+		forbidden[t] = true
+
+	var w: int = _skeleton.grid_size.x
+	var h: int = _skeleton.grid_size.y
+	var open_tile_count: int = w * h - forbidden.size()
+	var target_count: int = int(float(open_tile_count) * _skeleton.filler_density)
+	target_count = mini(target_count, GameConfig.OBSTACLE_COUNT_BASE)
+
+	var filler: Array[Vector2i] = []
+	var attempts: int = 0
+	while filler.size() < target_count and attempts < GameConfig.OBSTACLE_GEN_ATTEMPTS * 2:
+		var tile := Vector2i(rng.randi() % w, rng.randi() % h)
+		attempts += 1
+		if forbidden.has(tile):
+			continue
+		var combined: Array[Vector2i] = []
+		for t: Vector2i in module_obstacles:
+			combined.append(t)
+		for t: Vector2i in filler:
+			combined.append(t)
+		combined.append(tile)
+		if _all_paths_valid(combined, house_spawns, exit_tiles):
+			filler.append(tile)
+			forbidden[tile] = true
+
+	return filler
+
+
+func _make_house_from_module(
+	module: Module, spawn_tile: Vector2i, position_index: int, village_index: int
+) -> HouseData:
+	var house := HouseData.new()
+	house.house_type = module.house_type
+	house.spawn_tile = spawn_tile
+	house.house_position = position_index
+	house.tileset_id = _TILESET_ID.get(module.house_type, 0) as int
+	house.wave_size = _compute_wave_size(village_index, position_index)
+	if module.villager_archetypes.is_empty():
+		house.villager_archetypes = _make_archetype_list(module.house_type, house.wave_size)
+	else:
+		house.villager_archetypes = _scale_archetype_mix(module.villager_archetypes, house.wave_size)
+	return house
+
+
+func _scale_archetype_mix(mix: Array[StringName], wave_size: int) -> Array[StringName]:
+	# Repeat the declared mix until we hit wave_size, in order.
+	var result: Array[StringName] = []
+	for i: int in wave_size:
+		result.append(mix[i % mix.size()])
+	return result
+
+
+# === Modular Test Data — Skeleton + Module Pool ===
+
+func _build_test_skeleton() -> VillageSkeleton:
+	var sk := VillageSkeleton.new()
+	sk.biome = &"test_farmstead"
+	sk.grid_size = Vector2i(GameConfig.GRID_WIDTH, GameConfig.GRID_HEIGHT)
+	sk.filler_density = GameConfig.MODULAR_FILLER_DENSITY
+
+	# Five 4x4 slots, two columns on the left half; right half is the exit corridor.
+	# Layout (15x15 grid; '#' is slot, '.' walkable, 'E' exit):
+	#   .###.###.....E.
+	#   .###.###.......
+	#   .###.###.......
+	#   .###.###.......
+	#   ...............
+	#   .###.###.....E.
+	#   .###.###.......
+	#   .###.###.......
+	#   .###.###.......
+	#   ...............
+	#   .###...........
+	#   .###...........
+	#   .###...........
+	#   .###...........
+	#   ...............
+	var slots: Array[SlotDef] = []
+	slots.append(_make_slot(&"top_left",    Vector2i(1, 0),  Vector2i(4, 4)))
+	slots.append(_make_slot(&"top_mid",     Vector2i(5, 0),  Vector2i(4, 4)))
+	slots.append(_make_slot(&"middle_left", Vector2i(1, 5),  Vector2i(4, 4)))
+	slots.append(_make_slot(&"middle_mid",  Vector2i(5, 5),  Vector2i(4, 4)))
+	slots.append(_make_slot(&"bottom_left", Vector2i(1, 10), Vector2i(4, 4)))
+	sk.slots = slots
+
+	var exits: Array[Vector2i] = []
+	exits.append(Vector2i(GameConfig.GRID_WIDTH - 1, 2))
+	exits.append(Vector2i(GameConfig.GRID_WIDTH - 1, 7))
+	exits.append(Vector2i(GameConfig.GRID_WIDTH - 1, 12))
+	sk.exit_tiles = exits
+	return sk
+
+
+func _make_slot(slot_name: StringName, origin: Vector2i, bounds: Vector2i) -> SlotDef:
+	var s := SlotDef.new()
+	s.slot_name = slot_name
+	s.origin_tile = origin
+	s.bounds = bounds
+	s.allowed_categories = []   # any module accepted (loose gating for MVP)
+	return s
+
+
+func _build_module_pool() -> Array[Module]:
+	var pool: Array[Module] = []
+	pool.append(_make_farmstead_pen())
+	pool.append(_make_market_stall_row())
+	pool.append(_make_religious_compound())
+	pool.append(_make_civic_well())
+	return pool
+
+
+# 4x4 footprint. House sits in centre; L-shaped fence on the north and west edges.
+#   F F F .
+#   F . . .
+#   F . H .
+#   . . . .
+func _make_farmstead_pen() -> Module:
+	var m := Module.new()
+	m.module_name = &"farmstead_pen"
+	m.category = &"farmstead"
+	m.footprint = Vector2i(4, 4)
+	m.house_offset = Vector2i(2, 2)
+	m.house_type = &"cemetery"   # signature: gravedigger
+	var obs: Array[Vector2i] = []
+	obs.append(Vector2i(0, 0)); obs.append(Vector2i(1, 0)); obs.append(Vector2i(2, 0))
+	obs.append(Vector2i(0, 1)); obs.append(Vector2i(0, 2))
+	m.obstacle_offsets = obs
+	var edges: Array[StringName] = [&"south", &"east"]
+	m.open_edges = edges
+	return m
+
+
+# 4x4 footprint. Three stall obstacles form a row with aisles between them.
+#   . S . S
+#   . . . .
+#   H S . S
+#   . . . .
+func _make_market_stall_row() -> Module:
+	var m := Module.new()
+	m.module_name = &"market_stall_row"
+	m.category = &"market"
+	m.footprint = Vector2i(4, 4)
+	m.house_offset = Vector2i(0, 2)
+	m.house_type = &"apothecary"  # signature: doctor
+	var obs: Array[Vector2i] = []
+	obs.append(Vector2i(1, 0)); obs.append(Vector2i(3, 0))
+	obs.append(Vector2i(1, 2)); obs.append(Vector2i(3, 2))
+	m.obstacle_offsets = obs
+	var edges: Array[StringName] = [&"north", &"south", &"east"]
+	m.open_edges = edges
+	return m
+
+
+# 4x4 footprint. Cloister-style: house centred, paired pillar clusters at opposite corners.
+#   P P . .
+#   P . . .
+#   . . H .
+#   . . . P
+func _make_religious_compound() -> Module:
+	var m := Module.new()
+	m.module_name = &"religious_compound"
+	m.category = &"religious"
+	m.footprint = Vector2i(4, 4)
+	m.house_offset = Vector2i(2, 2)
+	m.house_type = &"chapel"      # signature: priest
+	var obs: Array[Vector2i] = []
+	obs.append(Vector2i(0, 0)); obs.append(Vector2i(1, 0)); obs.append(Vector2i(0, 1))
+	obs.append(Vector2i(3, 3))
+	m.obstacle_offsets = obs
+	var edges: Array[StringName] = [&"south", &"east"]
+	m.open_edges = edges
+	return m
+
+
+# 4x4 footprint. Civic well — single obstacle cluster at one corner, house opposite.
+#   . . . H
+#   . . . .
+#   . W . .
+#   . . . .
+func _make_civic_well() -> Module:
+	var m := Module.new()
+	m.module_name = &"civic_well"
+	m.category = &"civic"
+	m.footprint = Vector2i(4, 4)
+	m.house_offset = Vector2i(3, 0)
+	m.house_type = &"almshouse"   # signature: elder
+	var obs: Array[Vector2i] = []
+	obs.append(Vector2i(1, 2))
+	m.obstacle_offsets = obs
+	var edges: Array[StringName] = [&"north", &"south", &"east", &"west"]
+	m.open_edges = edges
+	return m
+
+
+# === Legacy Generation (preserved unchanged behind feature flag) ===
+
+func _generate_legacy(rng: RandomNumberGenerator, village_index: int) -> VillageData:
 	var data := VillageData.new()
 	data.village_index = village_index
 
@@ -185,7 +476,7 @@ func _make_archetype_list(house_type: StringName, wave_size: int) -> Array[Strin
 	return result
 
 
-# === Private — Obstacle Generation ===
+# === Private — Obstacle Generation (legacy) ===
 
 func _generate_obstacles(
 	rng: RandomNumberGenerator,

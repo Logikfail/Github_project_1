@@ -80,6 +80,15 @@ const HOUSE_PLACEMENT_ATTEMPTS: int = 100        # rejection-sampling attempts b
 const OBSTACLE_COUNT_BASE: int = 10              # BALANCE: target number of static obstacles per village
 const OBSTACLE_GEN_ATTEMPTS: int = 50            # max iterations when placing obstacles
 
+# --- Modular Village Generation ---
+## Feature flag — when true, VillageGenerator builds villages from skeleton + modules + filler.
+## When false, falls back to the original purely-procedural placement.
+const USE_MODULAR_GENERATION: bool = true
+## Fraction of remaining walkable tiles that may receive a filler obstacle in modular mode.
+const MODULAR_FILLER_DENSITY: float = 0.12        # BALANCE
+## Max attempts when assigning a module to a slot before leaving the slot empty.
+const MODULE_ASSIGNMENT_ATTEMPTS: int = 8
+
 # --- Archetype HP Ratios (relative to Standard villager base HP) ---
 const ARCHETYPE_HP_RATIOS: Dictionary = {
 	&"standard":    1.0,
