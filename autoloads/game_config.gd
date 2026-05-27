@@ -25,6 +25,10 @@ const VILLAGER_SPEED_FLOOR: float = 0.2        # BALANCE: minimum as fraction of
 
 # --- Desperate State ---
 const DESPERATE_STATE_DELAY: float = 2.0       # BALANCE: seconds before Desperate triggers with no path
+const DESPERATE_DAMAGE_BONUS_TO_STRUCTURES: float = 10.0   # BALANCE: +1000% demolish damage when desperate (11x total)
+const DESPERATE_DAMAGE_REDUCTION: float = 0.9              # BALANCE: incoming infection damage reduced by this fraction when desperate
+const DESPERATE_OUTLINE_COLOR: Color = Color(1.0, 0.0, 0.0, 1.0)
+const DESPERATE_OUTLINE_SCALE: float = 1.18                # outline mesh scale relative to body
 
 # --- Barricade ---
 const BARRICADE_HP: float = 100.0              # BALANCE

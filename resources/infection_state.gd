@@ -34,3 +34,6 @@ var speed_modifiers: Dictionary = {}             # StringName source_id → floa
 var current_damage: float = 0.0
 var max_hp: float = 100.0
 var rot_immune: bool = false
+## Fraction of incoming tick damage to nullify [0–1]. Driven by VillagerManager
+## while the villager is in the Desperate state.
+var damage_reduction: float = 0.0

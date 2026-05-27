@@ -185,6 +185,14 @@ func set_rot_immune(villager: Node, immune: bool) -> void:
 	(_states[villager] as InfectionState).rot_immune = immune
 
 
+## Fraction of incoming tick damage to nullify [0–1]. Used by VillagerManager
+## to make Desperate-state villagers durable while they smash barricades.
+func set_damage_reduction(villager: Node, value: float) -> void:
+	if not _states.has(villager):
+		return
+	(_states[villager] as InfectionState).damage_reduction = clampf(value, 0.0, 1.0)
+
+
 # === Private Methods ===
 
 func _apply_plague(state: InfectionState, effect: InfectionEffect) -> void:
@@ -219,7 +227,7 @@ func _process_villager_tick(villager: Node) -> void:
 		var d := dot as InfectionState.ActiveDot
 		var resistance: float = get_resistance(villager, d.effect_type)
 		var raw: float = (d.base_damage + d.escalation_rate * float(d.ticks_elapsed)) * float(d.stack_count)
-		state.current_damage += raw * (1.0 - resistance)
+		state.current_damage += raw * (1.0 - resistance) * (1.0 - state.damage_reduction)
 
 		if d.effect_type == &"pestilence" and d.spread_chance > 0.0:
 			_pestilence_spread_roll(villager, d)

@@ -63,6 +63,24 @@ func set_desperate(villager: Node, target_barricade: Node) -> void:
 	state.desperate_target = target_barricade
 	state.path = PackedVector2Array()
 	state.path_index = 0
+	_apply_desperate_side_effects(villager, true)
+
+
+func _exit_desperate(villager: Node, state: VillagerState) -> void:
+	state.move_state = MoveState.MOVING
+	state.desperate_target = null
+	state.path = PackedVector2Array()
+	state.path_index = 0
+	_apply_desperate_side_effects(villager, false)
+
+
+func _apply_desperate_side_effects(villager: Node, active: bool) -> void:
+	# Damage reduction (90% incoming nullification) lives on InfectionState.
+	var reduction: float = GameConfig.DESPERATE_DAMAGE_REDUCTION if active else 0.0
+	InfectionManager.set_damage_reduction(villager, reduction)
+	# Visual outline lives on the villager scene.
+	if villager.has_method(&"set_desperate_visual"):
+		villager.set_desperate_visual(active)
 
 
 func get_shield_hp(villager: Node) -> float:
@@ -221,7 +239,7 @@ func _advance_path(villager: Node, state: VillagerState, delta: float) -> bool:
 
 func _advance_toward_barricade(villager: Node, state: VillagerState, delta: float) -> void:
 	if not is_instance_valid(state.desperate_target):
-		state.move_state = MoveState.MOVING
+		_exit_desperate(villager, state)
 		_request_path(villager, state)
 		return
 
@@ -264,7 +282,8 @@ func _process_demolish(delta: float) -> void:
 			continue
 		var dist: float = EntityManager.get_entity_position(villager).distance_to(EntityManager.get_entity_position(state.desperate_target))
 		if dist <= GameConfig.TILE_HALF_WIDTH:
-			barricade_demolish_tick.emit(villager, state.desperate_target, GameConfig.DEMOLISH_RATE)
+			var amped_damage: float = GameConfig.DEMOLISH_RATE * (1.0 + GameConfig.DESPERATE_DAMAGE_BONUS_TO_STRUCTURES)
+			barricade_demolish_tick.emit(villager, state.desperate_target, amped_damage)
 
 
 # === Private Methods — Auras ===
@@ -400,10 +419,7 @@ func handle_barricade_destroyed(barricade: Node, _tile: Vector2i) -> void:
 			continue
 		var state: VillagerState = _states[villager]
 		if state.move_state == MoveState.DESPERATE and state.desperate_target == barricade:
-			state.move_state = MoveState.MOVING
-			state.desperate_target = null
-			state.path = PackedVector2Array()
-			state.path_index = 0
+			_exit_desperate(villager, state)
 			_request_path(villager, state)
 
 
