@@ -63,8 +63,10 @@ func start_campaign() -> void:
 
 func enter_village(village_index: int) -> void:
 	_begin_village(village_index)
-	if village_index == 0:
-		DraftManager.generate_starter_draft()
+	# Every village opens with a starter draft. Village 1 onward sees the deck
+	# cleared by _complete_village(), so without this the player would enter
+	# with no towers to place before the first wave.
+	DraftManager.generate_starter_draft()
 
 
 func get_current_village_index() -> int:
