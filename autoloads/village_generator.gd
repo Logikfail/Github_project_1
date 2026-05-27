@@ -232,92 +232,76 @@ func _make_slot(slot_name: StringName, origin: Vector2i, bounds: Vector2i) -> Sl
 
 func _build_module_pool() -> Array[Module]:
 	var pool: Array[Module] = []
-	pool.append(_make_farmstead_pen())
-	pool.append(_make_market_stall_row())
-	pool.append(_make_religious_compound())
-	pool.append(_make_civic_well())
+	pool.append(_make_hovel_corner_obstacle())
+	pool.append(_make_hovel_center_obstacle())
+	pool.append(_make_hovel_edge_obstacle())
 	return pool
 
 
-# 4x4 footprint. House sits in centre; L-shaped fence on the north and west edges.
-#   F F F .
-#   F . . .
-#   F . H .
+# Three minimal test modules — each a 4x4 footprint, one standard "hovel"
+# house, one obstacle in a different position. All four edges declared open
+# so pathing can enter from any side; obstacle position is the only
+# variable, letting the generator produce visibly different layouts.
+#
+# Legend: H = house spawn, X = obstacle, . = open walkable tile.
+
+
+# Obstacle in the north-west corner; house in the south-east.
+#   X . . .
 #   . . . .
-func _make_farmstead_pen() -> Module:
-	var m := Module.new()
-	m.module_name = &"farmstead_pen"
-	m.category = &"farmstead"
-	m.footprint = Vector2i(4, 4)
-	m.house_offset = Vector2i(2, 2)
-	m.house_type = &"cemetery"   # signature: gravedigger
-	var obs: Array[Vector2i] = []
-	obs.append(Vector2i(0, 0)); obs.append(Vector2i(1, 0)); obs.append(Vector2i(2, 0))
-	obs.append(Vector2i(0, 1)); obs.append(Vector2i(0, 2))
-	m.obstacle_offsets = obs
-	var edges: Array[StringName] = [&"south", &"east"]
-	m.open_edges = edges
-	return m
-
-
-# 4x4 footprint. Three stall obstacles form a row with aisles between them.
-#   . S . S
 #   . . . .
-#   H S . S
-#   . . . .
-func _make_market_stall_row() -> Module:
-	var m := Module.new()
-	m.module_name = &"market_stall_row"
-	m.category = &"market"
-	m.footprint = Vector2i(4, 4)
-	m.house_offset = Vector2i(0, 2)
-	m.house_type = &"apothecary"  # signature: doctor
-	var obs: Array[Vector2i] = []
-	obs.append(Vector2i(1, 0)); obs.append(Vector2i(3, 0))
-	obs.append(Vector2i(1, 2)); obs.append(Vector2i(3, 2))
-	m.obstacle_offsets = obs
-	var edges: Array[StringName] = [&"north", &"south", &"east"]
-	m.open_edges = edges
-	return m
-
-
-# 4x4 footprint. Cloister-style: house centred, paired pillar clusters at opposite corners.
-#   P P . .
-#   P . . .
-#   . . H .
-#   . . . P
-func _make_religious_compound() -> Module:
-	var m := Module.new()
-	m.module_name = &"religious_compound"
-	m.category = &"religious"
-	m.footprint = Vector2i(4, 4)
-	m.house_offset = Vector2i(2, 2)
-	m.house_type = &"chapel"      # signature: priest
-	var obs: Array[Vector2i] = []
-	obs.append(Vector2i(0, 0)); obs.append(Vector2i(1, 0)); obs.append(Vector2i(0, 1))
-	obs.append(Vector2i(3, 3))
-	m.obstacle_offsets = obs
-	var edges: Array[StringName] = [&"south", &"east"]
-	m.open_edges = edges
-	return m
-
-
-# 4x4 footprint. Civic well — single obstacle cluster at one corner, house opposite.
 #   . . . H
-#   . . . .
-#   . W . .
-#   . . . .
-func _make_civic_well() -> Module:
+func _make_hovel_corner_obstacle() -> Module:
 	var m := Module.new()
-	m.module_name = &"civic_well"
-	m.category = &"civic"
+	m.module_name = &"hovel_nw_block"
+	m.category = &"hovel"
 	m.footprint = Vector2i(4, 4)
-	m.house_offset = Vector2i(3, 0)
-	m.house_type = &"almshouse"   # signature: elder
+	m.house_offset = Vector2i(3, 3)
+	m.house_type = &"hovel"
 	var obs: Array[Vector2i] = []
-	obs.append(Vector2i(1, 2))
+	obs.append(Vector2i(0, 0))
 	m.obstacle_offsets = obs
-	var edges: Array[StringName] = [&"north", &"south", &"east", &"west"]
+	var edges: Array[StringName] = [&"north", &"east", &"south", &"west"]
+	m.open_edges = edges
+	return m
+
+
+# Obstacle in the centre, slightly biased so the house has clear access.
+#   . . . .
+#   . X . .
+#   . . . .
+#   H . . .
+func _make_hovel_center_obstacle() -> Module:
+	var m := Module.new()
+	m.module_name = &"hovel_center_block"
+	m.category = &"hovel"
+	m.footprint = Vector2i(4, 4)
+	m.house_offset = Vector2i(0, 3)
+	m.house_type = &"hovel"
+	var obs: Array[Vector2i] = []
+	obs.append(Vector2i(1, 1))
+	m.obstacle_offsets = obs
+	var edges: Array[StringName] = [&"north", &"east", &"south", &"west"]
+	m.open_edges = edges
+	return m
+
+
+# Obstacle along the east edge; house on the west.
+#   . . . .
+#   H . . X
+#   . . . .
+#   . . . .
+func _make_hovel_edge_obstacle() -> Module:
+	var m := Module.new()
+	m.module_name = &"hovel_east_block"
+	m.category = &"hovel"
+	m.footprint = Vector2i(4, 4)
+	m.house_offset = Vector2i(0, 1)
+	m.house_type = &"hovel"
+	var obs: Array[Vector2i] = []
+	obs.append(Vector2i(3, 1))
+	m.obstacle_offsets = obs
+	var edges: Array[StringName] = [&"north", &"east", &"south", &"west"]
 	m.open_edges = edges
 	return m
 
