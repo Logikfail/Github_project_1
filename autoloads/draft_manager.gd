@@ -37,7 +37,6 @@ func generate_starter_draft() -> Array[TowerData]:
 
 
 func generate_draft(pool: Array[StringName]) -> Array[TowerData]:
-	print("[DraftManager] generate_draft called — pool=", pool, " current_pending=", _pending_draft.size())
 	var result: Array[TowerData] = []
 	for i: int in GameConfig.TOWER_DRAFT_SIZE:
 		var type: StringName = _random_from(pool)
@@ -47,7 +46,6 @@ func generate_draft(pool: Array[StringName]) -> Array[TowerData]:
 			_synthesis_pending[data] = true
 		result.append(data)
 	_pending_draft.append_array(result)
-	print("[DraftManager] post-append pending size=", _pending_draft.size())
 	if not _pending_draft.is_empty():
 		pending_draft_non_empty.emit()
 	return result

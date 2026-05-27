@@ -117,11 +117,7 @@ func _on_wave_complete(
 	_escaped_count: int,
 	_infected_count: int
 ) -> void:
-	print("[CampaignManager] _on_wave_complete — active=", _active,
-			" houses_cleared(prev)=", _houses_cleared,
-			" HOUSES_PER_VILLAGE=", GameConfig.HOUSES_PER_VILLAGE)
 	if not _active:
-		push_warning("[CampaignManager] wave_complete fired but _active is FALSE — draft will NOT be generated")
 		return
 
 	_houses_cleared += 1
@@ -131,7 +127,6 @@ func _on_wave_complete(
 	else:
 		var pool: Array[StringName] = GameConfig.BASE_TOWER_TYPES.duplicate()
 		pool.append_array(TechTreeManager.get_unlocked_synthesis_towers())
-		print("[CampaignManager] generating post-wave draft, pool size=", pool.size())
 		DraftManager.generate_draft(pool)
 		TechTreeManager.add_points(GameConfig.TECH_POINTS_PER_WAVE)
 
