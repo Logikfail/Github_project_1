@@ -44,15 +44,18 @@ func _ready() -> void:
 # === Private — Signal Handlers ===
 
 func _on_pending_draft_non_empty() -> void:
+	print("[DraftUI] _on_pending_draft_non_empty fired — was _resolved=", _resolved)
 	_resolved = false
 	_refresh()
 
 
 func _on_tower_placed() -> void:
+	print("[DraftUI] _on_tower_placed — pending now=", DraftManager.get_pending_draft().size())
 	_refresh()
 
 
 func _on_draft_resolved() -> void:
+	print("[DraftUI] _on_draft_resolved")
 	_resolved = true
 	_refresh()
 
@@ -76,6 +79,11 @@ func _refresh() -> void:
 	_placement_section.visible = in_placement
 	_selection_hint.visible = in_selection
 	_rouse_button.disabled = not _resolved
+
+	print("[DraftUI] _refresh — pending=", pending_count, " placed=", placed.size(),
+			" _resolved=", _resolved, " in_placement=", in_placement,
+			" placement_section.visible=", _placement_section.visible,
+			" rouse_disabled=", _rouse_button.disabled)
 
 	if in_placement:
 		_towers_label.text = "Towers to place: %d" % pending_count
