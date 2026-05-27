@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/towers/tower_base.gd" id="1_tower"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_barricade"]
+size = Vector3(44, 36, 44)
+
+[sub_resource type="StandardMaterial3D" id="Mat_barricade"]
+albedo_color = Color(0.5, 0.35, 0.15, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape_barricade"]
+size = Vector3(44, 36, 44)
+
+[node name="Barricade" type="StaticBody3D"]
+script = ExtResource("1_tower")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+position = Vector3(0, 18, 0)
+mesh = SubResource("BoxMesh_barricade")
+surface_material_override/0 = SubResource("Mat_barricade")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 18, 0)
+shape = SubResource("BoxShape_barricade")

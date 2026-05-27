@@ -1,0 +1,21 @@
+# Godot 4+ specific ignores
+
+# Editor / import cache — regenerated on first open
+.godot/
+
+# Mono / C# build artifacts (project uses GDScript but the Godot binary is .mono)
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Build exports
+exports/
+builds/
+*.exe
+*.pck

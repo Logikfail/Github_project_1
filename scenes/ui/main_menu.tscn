@@ -1,0 +1,212 @@
+[gd_scene load_steps=10 format=3 uid="uid://bqrl8udjebdkk"]
+
+[ext_resource type="Script" uid="uid://dvft46gha0cjw" path="res://scenes/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="Shader" uid="uid://b7b72t2y7i86h" path="res://assets/shaders/plague_miasma.gdshader" id="2_miasma"]
+[ext_resource type="Shader" uid="uid://cw016vpeoyo6e" path="res://assets/shaders/title_decay.gdshader" id="3_decay"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_miasma"]
+shader = ExtResource("2_miasma")
+shader_parameter/color_void = Color(0.02, 0.01, 0.04, 1)
+shader_parameter/color_mid = Color(0.18, 0.08, 0.22, 1)
+shader_parameter/color_glow = Color(0.45, 0.85, 0.25, 1)
+shader_parameter/color_ember = Color(0.85, 1, 0.55, 1)
+shader_parameter/glow_radius = 0.55
+shader_parameter/glow_softness = 0.7
+shader_parameter/warp_strength = 0.18
+shader_parameter/drift_speed = 0.04
+shader_parameter/pulse_speed = 1.6
+shader_parameter/pulse_strength = 0.1
+shader_parameter/pulse_frequency = 11.0
+shader_parameter/wisp_strength = 0.35
+shader_parameter/wisp_speed = 0.18
+shader_parameter/ember_density = 0.965
+shader_parameter/ember_brightness = 1.4
+shader_parameter/ember_speed = 0.22
+shader_parameter/vignette_strength = 1.5
+shader_parameter/grain_amount = 0.015
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_title"]
+shader = ExtResource("3_decay")
+shader_parameter/aberration = 2.5
+shader_parameter/halo_radius = 3.0
+shader_parameter/halo_strength = 1.6
+shader_parameter/drip_length = 0.35
+shader_parameter/drip_strength = 0.7
+shader_parameter/wobble_amount = 1.2
+shader_parameter/wobble_speed = 1.5
+shader_parameter/pulse_speed = 0.6
+shader_parameter/tint_low = Color(0.55, 0.95, 0.35, 1)
+shader_parameter/tint_high = Color(0.85, 0.55, 1, 1)
+shader_parameter/halo_color = Color(0.35, 0.85, 0.2, 1)
+shader_parameter/drip_color = Color(0.25, 0.65, 0.15, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_disabled"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.04, 0.03, 0.05, 0.55)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.18, 0.18, 0.4)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.1, 0.18, 0.06, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.95, 0.35, 0.95)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.18, 0.3, 0.08, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.55, 1, 0.9)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.06, 0.05, 0.08, 0.78)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.55, 0.18, 0.55)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="BG" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_miasma")
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.02, 0.08, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="TitleLabel" type="Label" parent="Center/VBox"]
+material = SubResource("ShaderMaterial_title")
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 1, 0.7, 1)
+theme_override_font_sizes/font_size = 48
+text = "PLAGUE LORD"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Center/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.45, 0.65, 0.85)
+theme_override_font_sizes/font_size = 14
+text = "— a tower defence of decay —"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+
+[node name="CampaignButton" type="Button" parent="Center/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 52)
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(0.4, 0.4, 0.45, 0.7)
+theme_override_colors/font_hover_color = Color(1, 1, 0.85, 1)
+theme_override_colors/font_color = Color(0.85, 1, 0.7, 1)
+theme_override_colors/font_pressed_color = Color(0.95, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "Campaign"
+
+[node name="EndlessButton" type="Button" parent="Center/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 52)
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(0.4, 0.4, 0.45, 0.7)
+theme_override_colors/font_hover_color = Color(1, 1, 0.85, 1)
+theme_override_colors/font_color = Color(0.85, 1, 0.7, 1)
+theme_override_colors/font_pressed_color = Color(0.95, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "Endless"
+
+[node name="SettingsButton" type="Button" parent="Center/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 52)
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(0.4, 0.4, 0.45, 0.7)
+theme_override_colors/font_hover_color = Color(1, 1, 0.85, 1)
+theme_override_colors/font_color = Color(0.85, 1, 0.7, 1)
+theme_override_colors/font_pressed_color = Color(0.95, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "Settings"
+
+[node name="QuitButton" type="Button" parent="Center/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 52)
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(0.4, 0.4, 0.45, 0.7)
+theme_override_colors/font_hover_color = Color(1, 1, 0.85, 1)
+theme_override_colors/font_color = Color(0.85, 1, 0.7, 1)
+theme_override_colors/font_pressed_color = Color(0.95, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/disabled = SubResource("StyleBoxFlat_btn_disabled")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+text = "Quit"

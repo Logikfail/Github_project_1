@@ -1,0 +1,30 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Plague Lord TD"
+run/main_scene="res://scenes/ui/main_menu.tscn"
+config/features=PackedStringArray("4.4", "Forward Plus")
+
+[autoload]
+
+GameConfig="*res://autoloads/game_config.gd"
+NavigationManager="*res://autoloads/navigation_manager.gd"
+EntityManager="*res://autoloads/entity_manager.gd"
+InfectionManager="*res://autoloads/infection_manager.gd"
+VillagerManager="*res://autoloads/villager_manager.gd"
+TowerManager="*res://autoloads/tower_manager.gd"
+WaveManager="*res://autoloads/wave_manager.gd"
+MoraleManager="*res://autoloads/morale_manager.gd"
+DraftManager="*res://autoloads/draft_manager.gd"
+TechTreeManager="*res://autoloads/tech_tree_manager.gd"
+VillageGenerator="*res://autoloads/village_generator.gd"
+CampaignManager="*res://autoloads/campaign_manager.gd"

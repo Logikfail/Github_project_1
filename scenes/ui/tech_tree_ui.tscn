@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/tech_tree_ui.gd" id="1_tech"]
+
+[node name="TechTreeUI" type="Control"]
+script = ExtResource("1_tech")
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="TechPanel" type="PanelContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="TechPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PointsLabel" type="Label" parent="TechPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tech Points: 0"
+theme_override_font_sizes/font_size = 16
+
+[node name="BranchContainer" type="VBoxContainer" parent="TechPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6

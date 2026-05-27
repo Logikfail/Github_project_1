@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://components/infection_bar.gd" id="1_infbar"]
+
+[node name="InfectionBar" type="ProgressBar"]
+script = ExtResource("1_infbar")
+custom_minimum_size = Vector2(60, 8)
+min_value = 0.0
+max_value = 1.0
+value = 0.0
+show_percentage = false

@@ -1,0 +1,43 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/world/world_root.gd" id="1_root"]
+[ext_resource type="Script" path="res://scenes/world/hex_grid.gd" id="2_hexgrid"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/draft_ui.tscn" id="4_draft"]
+[ext_resource type="PackedScene" path="res://scenes/ui/tower_inspector.tscn" id="5_inspector"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="6_pause"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_root")
+
+[node name="MainCamera" type="Camera3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 1400, -400)
+projection = 1
+size = 1800.0
+far = 10000.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866, 0, -0.866, 0.5, 0, 1000, 0)
+shadow_enabled = true
+
+[node name="WorldContainer" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="HexGrid" type="MeshInstance3D" parent="WorldContainer"]
+script = ExtResource("2_hexgrid")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UI" instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="DraftUI" parent="UI" instance=ExtResource("4_draft")]
+unique_name_in_owner = true
+
+[node name="TowerInspector" parent="UI" instance=ExtResource("5_inspector")]
+unique_name_in_owner = true
+
+[node name="PauseMenu" parent="UI" instance=ExtResource("6_pause")]
+unique_name_in_owner = true
+

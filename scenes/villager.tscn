@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/villager.gd" id="1_villager"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_001"]
+radius = 12.0
+height = 48.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_villager"]
+albedo_color = Color(0.2, 0.8, 0.2, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_001"]
+radius = 12.0
+height = 48.0
+
+[node name="Villager" type="CharacterBody3D"]
+script = ExtResource("1_villager")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+position = Vector3(0, 24, 0)
+mesh = SubResource("CapsuleMesh_001")
+surface_material_override/0 = SubResource("Mat_villager")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 24, 0)
+shape = SubResource("CapsuleShape_001")

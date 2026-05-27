@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/world_map.gd" id="1_wmap"]
+
+[node name="WorldMap" type="Control"]
+script = ExtResource("1_wmap")
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="MapPanel" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_right = 250.0
+offset_top = 8.0
+offset_bottom = 56.0
+
+[node name="VBox" type="VBoxContainer" parent="MapPanel"]
+layout_mode = 2
+
+[node name="MapLabel" type="Label" parent="MapPanel/VBox"]
+text = "World Map"
+horizontal_alignment = 1
+
+[node name="NodesContainer" type="HBoxContainer" parent="MapPanel/VBox"]
+unique_name_in_owner = true
+alignment = 1

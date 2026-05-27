@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/towers/tower_base.gd" id="1_tower"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_tower"]
+size = Vector3(40, 48, 40)
+
+[sub_resource type="StandardMaterial3D" id="Mat_tower"]
+albedo_color = Color(0.8, 0.1, 0.1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape_tower"]
+size = Vector3(40, 48, 40)
+
+[sub_resource type="CylinderMesh" id="CylMesh_range"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 2.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_range"]
+transparency = 1
+albedo_color = Color(1.0, 0.8, 0.0, 0.15)
+
+[node name="TowerBase" type="StaticBody3D"]
+script = ExtResource("1_tower")
+input_ray_pickable = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+position = Vector3(0, 24, 0)
+mesh = SubResource("BoxMesh_tower")
+surface_material_override/0 = SubResource("Mat_tower")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 24, 0)
+shape = SubResource("BoxShape_tower")
+
+[node name="RangeRing" type="MeshInstance3D" parent="."]
+position = Vector3(0, 2, 0)
+mesh = SubResource("CylMesh_range")
+surface_material_override/0 = SubResource("Mat_range")
+visible = false

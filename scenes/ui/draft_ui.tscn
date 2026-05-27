@@ -1,0 +1,66 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/draft_ui.gd" id="1_draft"]
+
+[node name="DraftUI" type="Control"]
+script = ExtResource("1_draft")
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="BottomBar" type="PanelContainer" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -72.0
+
+[node name="HBox" type="HBoxContainer" parent="BottomBar"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PlacementSection" type="VBoxContainer" parent="BottomBar/HBox"]
+unique_name_in_owner = true
+visible = false
+theme_override_constants/separation = 2
+custom_minimum_size = Vector2(200, 0)
+
+[node name="TowersLabel" type="Label" parent="BottomBar/HBox/PlacementSection"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Towers to place: 0"
+theme_override_font_sizes/font_size = 12
+
+[node name="PlaceTowerButton" type="Button" parent="BottomBar/HBox/PlacementSection"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Place Tower"
+custom_minimum_size = Vector2(180, 36)
+
+[node name="SelectionHint" type="Label" parent="BottomBar/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Click a placed tower to keep or combine."
+visible = false
+vertical_alignment = 1
+custom_minimum_size = Vector2(240, 0)
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 0.95, 0.6, 1)
+
+[node name="Spacer" type="Control" parent="BottomBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RouseButton" type="Button" parent="BottomBar/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Rouse!"
+disabled = true
+custom_minimum_size = Vector2(120, 48)
+vertical_alignment = 1
+
+[node name="ResistanceOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+visible = false
+mouse_filter = 2

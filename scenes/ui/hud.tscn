@@ -1,0 +1,138 @@
+[gd_scene load_steps=2 format=3 uid="uid://diwkaaq6r07o"]
+
+[ext_resource type="Script" uid="uid://ds5fxgbqggs6n" path="res://scenes/ui/hud.gd" id="1_hud"]
+
+[node name="HUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="TopBar" type="PanelContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 68.0
+
+[node name="HBox" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="VillageInfo" type="VBoxContainer" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 2
+
+[node name="VillageLabel" type="Label" parent="TopBar/HBox/VillageInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Village 1 / 5"
+
+[node name="HousesLabel" type="Label" parent="TopBar/HBox/VillageInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Houses: 0 / 0"
+
+[node name="VSep1" type="VSeparator" parent="TopBar/HBox"]
+layout_mode = 2
+
+[node name="MoraleSection" type="VBoxContainer" parent="TopBar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="MoraleLabel" type="Label" parent="TopBar/HBox/MoraleSection"]
+layout_mode = 2
+text = "Morale"
+horizontal_alignment = 1
+
+[node name="MoraleBar" type="ProgressBar" parent="TopBar/HBox/MoraleSection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+value = 0.5
+show_percentage = false
+
+[node name="VSep2" type="VSeparator" parent="TopBar/HBox"]
+layout_mode = 2
+
+[node name="SpeedBox" type="HBoxContainer" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="Speed1x" type="Button" parent="TopBar/HBox/SpeedBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+toggle_mode = true
+button_pressed = true
+text = "> 1x"
+
+[node name="Speed2x" type="Button" parent="TopBar/HBox/SpeedBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+toggle_mode = true
+text = ">> 2x"
+
+[node name="Speed3x" type="Button" parent="TopBar/HBox/SpeedBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+toggle_mode = true
+text = ">>> 3x"
+
+[node name="VSep3" type="VSeparator" parent="TopBar/HBox"]
+layout_mode = 2
+
+[node name="MenuButton" type="Button" parent="TopBar/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "☰ Menu"
+
+[node name="ModifiersPanel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 76.0
+offset_right = 320.0
+offset_bottom = 108.0
+
+[node name="VBox3" type="VBoxContainer" parent="ModifiersPanel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ModifiersLabel" type="Label" parent="ModifiersPanel/VBox3"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="StatusBar" type="PanelContainer" parent="."]
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -112.0
+offset_bottom = -72.0
+
+[node name="StatusLabel" type="Label" parent="StatusBar"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
